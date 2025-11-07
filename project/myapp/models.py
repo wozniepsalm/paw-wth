@@ -4,6 +4,11 @@ from django.db import models
 MONTHS = models.IntegerChoices(
     'Miesiace',
     'Styczeń Luty Marzec Kwiecień Maj Czerwiec Lipiec Sierpień Wrzesień Październik Listopad Grudzień'
+) 
+
+PLCIE = models.IntegerChoices(
+    "Plcie",
+    "Kobieta Mężczyzna Inna"
 )
 
 # Lista wyboru formatu książki
@@ -66,11 +71,18 @@ class Osoba(models.Model):
     )
     imie = models.CharField(max_length=50, blank=False, null=False)
     nazwisko = models.CharField(max_length=100, blank=False, null=False)
-    plec = models.CharField(max_length=1, choices=PLEC_WYBOR, blank=False, null=False)
-    stanowisko = models.ForeignKey('stanowisko', on_delete=models.CASCADE, blank=True, null=True)
+    plec = models.IntegerField(choices=PLCIE.choices, default=PLCIE.choices[2][0])
+    stanowisko = models.ForeignKey('Stanowisko', on_delete=models.CASCADE, blank=True, null=True)
     data_dodania = models.DateField(auto_now_add=True, editable=False) 
+    def __str__(self):
+        return f"Osoba: {self.imie} {self.nazwisko}"
+
+    class Meta:
+        ordering = ["nazwisko", "imie"]
 
 
-class stanowisko(models.Model):
+class Stanowisko(models.Model):
     nazwa = models.CharField(max_length=70, blank=False, null=False)
     opis = models.TextField(blank=True, null=True)  
+    def __str__(self):
+        return self.nazwa
